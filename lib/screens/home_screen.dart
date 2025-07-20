@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:style_scout/screens/analysis_screen.dart';
+// We no longer import HistoryScreen here.
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,13 +15,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<void> _pickImage(ImageSource source) async {
-    try {
-      final imagePicker = ImagePicker();
-      final pickedFile = await imagePicker.pickImage(
-        source: source,
-        imageQuality: 80,
-      );
-      if (pickedFile != null && mounted) {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
+
+    if (pickedFile != null) {
+      if (mounted) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -29,51 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-    } on PlatformException catch (e) {
-      _showSnackbar(
-        'Could not access ${source == ImageSource.camera ? "camera" : "gallery"}.\n${e.message}',
-      );
-    } catch (e) {
-      _showSnackbar('Failed to pick image.');
-    }
-  }
-
-  void _showSnackbar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
-    }
-  }
-
-  Future<void> _confirmAndLogout() async {
-    final shouldLogout = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-          TextButton(
-            child: const Text('Log Out'),
-            onPressed: () => Navigator.pop(context, true),
-          ),
-        ],
-      ),
-    );
-    if (shouldLogout == true) {
-      await FirebaseAuth.instance.signOut();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
-    );
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -83,10 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Style Scout'),
         centerTitle: true,
         actions: [
+          // The History IconButton has been removed.
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Log Out',
-            onPressed: _confirmAndLogout,
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
           ),
         ],
       ),

@@ -1,12 +1,13 @@
-import "package:flutter/material.dart";
-import "package:style_scout/screens/auth_screen.dart";
+import 'package:flutter/material.dart';
+import 'package:style_scout/screens/auth_screen.dart';
+// Import the HomeScreen
+import 'package:style_scout/screens/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -21,7 +22,6 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -32,9 +32,9 @@ class WelcomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(Icons.style, color: Color(0xFFE94560), size: 40),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Text(
-                    "Welcome to\nStyle Scout",
+                    'Welcome to\nStyle Scout',
                     style: theme.textTheme.displayLarge?.copyWith(
                       fontSize: 44,
                       height: 1.2,
@@ -48,7 +48,22 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const AuthScreen(isLoginMode: false),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                    ),
+                    child: const Text('Get Started'),
+                  ),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -60,19 +75,26 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primaryColor,
+                      backgroundColor: Colors.white.withOpacity(0.1),
+                      elevation: 0,
                     ),
-                    child: const Text('Get Started'),
+                    child: const Text('I already have an account'),
                   ),
                   const SizedBox(height: 24),
                   Center(
                     child: TextButton(
-                      onPressed: () {},
+                      // --- THIS IS THE FIX ---
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
                       child: Text(
                         'Continue as Guest',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
+                        style: TextStyle(color: Colors.white.withOpacity(0.7)),
                       ),
                     ),
                   ),

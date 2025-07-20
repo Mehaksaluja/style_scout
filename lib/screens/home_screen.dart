@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-// Import the new AnalysisScreen
 import 'package:style_scout/screens/analysis_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,20 +13,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // We no longer need the _selectedImage state here, as we navigate away immediately.
-
   Future<void> _pickImage(ImageSource source) async {
-    final imagePicker = ImagePicker();
-    final pickedFile = await imagePicker.pickImage(
-      source: source,
-      imageQuality: 80,
-    );
-
-    if (pickedFile != null) {
-      // --- THIS IS THE CHANGE ---
-      // Instead of updating the state, we navigate to the new screen,
-      // passing the picked image file directly.
-      if (mounted) {
+    try {
+      final imagePicker = ImagePicker();
+      final pickedFile = await imagePicker.pickImage(
+        source: source,
+        imageQuality: 80,
+      );
+      if (pickedFile != null && mounted) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -36,12 +29,51 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
+    } on PlatformException catch (e) {
+      _showSnackbar(
+        'Could not access ${source == ImageSource.camera ? "camera" : "gallery"}.\n${e.message}',
+      );
+    } catch (e) {
+      _showSnackbar('Failed to pick image.');
+    }
+  }
+
+  void _showSnackbar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _confirmAndLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          TextButton(
+            child: const Text('Log Out'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+    if (shouldLogout == true) {
+      await FirebaseAuth.instance.signOut();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
+    );
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -54,9 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Log Out',
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-            },
+            onPressed: _confirmAndLogout,
           ),
         ],
       ),
@@ -68,7 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(flex: 2),
-              // The placeholder icon is now always visible on this screen.
               Container(
                 height: 300,
                 decoration: BoxDecoration(

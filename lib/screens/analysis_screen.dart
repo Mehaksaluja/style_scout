@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:style_scout/services/ai_service.dart';
-// Import the new markdown package
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class AnalysisScreen extends StatefulWidget {

@@ -1,9 +1,5 @@
-// lib/screens/auth_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// Import the HomeScreen to navigate to it after login/signup
-import 'package:style_scout/screens/home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isLoginMode;
@@ -44,9 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _submitAuthForm() async {
     final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) {
-      return;
-    }
+    if (!isValid) return;
     _formKey.currentState!.save();
 
     setState(() {
@@ -69,39 +63,31 @@ class _AuthScreenState extends State<AuthScreen> {
           _nameController.text.trim(),
         );
       }
-
-      // This is the fix: Navigate to the HomeScreen and remove all previous
-      // routes, so the user cannot go back to the login screen.
-      if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (route) => false, // This predicate removes all routes.
-        );
-      }
+      // NO navigation here! AuthGate handles screen changes.
     } on FirebaseAuthException catch (error) {
       var message = 'An error occurred, please check your credentials!';
-      if (error.message != null) {
-        message = error.message!;
-      }
+      if (error.message != null) message = error.message!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
-      if (mounted) {
+      if (mounted)
         setState(() {
           _isLoading = false;
         });
-      }
     } catch (error) {
       print(error);
-      if (mounted) {
+      if (mounted)
         setState(() {
           _isLoading = false;
         });
-      }
     }
+    if (mounted)
+      setState(() {
+        _isLoading = false;
+      });
   }
 
   @override
@@ -127,7 +113,6 @@ class _AuthScreenState extends State<AuthScreen> {
                 style: theme.textTheme.headlineSmall?.copyWith(fontSize: 18),
               ),
               const SizedBox(height: 48),
-
               if (!_isLogin)
                 TextFormField(
                   controller: _nameController,
@@ -140,7 +125,6 @@ class _AuthScreenState extends State<AuthScreen> {
                   },
                 ),
               if (!_isLogin) const SizedBox(height: 16),
-
               TextFormField(
                 controller: _emailController,
                 decoration: _buildInputDecoration('Email Address'),
@@ -165,7 +149,6 @@ class _AuthScreenState extends State<AuthScreen> {
                 },
               ),
               const SizedBox(height: 32),
-
               if (_isLoading)
                 const Center(child: CircularProgressIndicator())
               else
@@ -177,7 +160,6 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Text(_isLogin ? 'Log In' : 'Sign Up'),
                 ),
               const SizedBox(height: 24),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -209,9 +191,9 @@ class _AuthScreenState extends State<AuthScreen> {
   InputDecoration _buildInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+      labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
       filled: true,
-      fillColor: Colors.white.withValues(alpha: 0.05),
+      fillColor: Colors.white.withOpacity(0.05),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,

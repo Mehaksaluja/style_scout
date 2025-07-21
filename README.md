@@ -39,6 +39,13 @@
 
 ---
 
+## 📦 Download APK
+
+You can download the latest release of the app here:  
+👉 **[Download Style Scout APK](https://github.com/MehakSaluja/style_scout/releases/download/v1.0.0/app-release.apk)**
+
+---
+
 ## 🛠️ Getting Started
 
 ### 1. 🔧 Prerequisites
@@ -50,5 +57,5 @@
 ### 2. 🧪 Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/style_scout.git
+git clone https://github.com/salujamehak5/style_scout.git
 cd style_scout

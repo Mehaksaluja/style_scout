@@ -20,12 +20,6 @@
 
 ---
 
-## 📱 Screenshots
-
-*(You can add real screenshots here once available)*
-
----
-
 ## 🧱 Tech Stack
 
 | Category             | Technology                                      |
